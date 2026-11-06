@@ -39,8 +39,10 @@ export default function CartPage() {
               </p>
               <p className="text-gray-500">※価格はすべて税込表記です。</p>
             </div>
+            {/* ログイン必須ページのため、ログイン前の先読み結果が使い回されないよう先読みを無効化 */}
             <Link
               href="/order-confirm"
+              prefetch={false}
               className="bg-indigo-500 hover:bg-indigo-600 text-white py-2 px-6 rounded"
             >
               購入手続きへ

@@ -88,7 +88,8 @@ export default function Header({ user }: HeaderProps) {
           <Suspense fallback={<SearchFormView />}>
             <SearchForm />
           </Suspense>
-          <Link href="/account/favorites">
+          {/* ログイン状態で遷移先が変わるため、ログイン前の先読み結果（ログインページへのリダイレクト）が使い回されないよう先読みを無効化 */}
+          <Link href="/account/favorites" prefetch={false}>
             <Image
               src="/icons/heart-icon.svg"
               alt="Favorites"
