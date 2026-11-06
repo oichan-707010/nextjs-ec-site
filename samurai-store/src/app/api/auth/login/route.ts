@@ -57,7 +57,8 @@ export async function POST(request: NextRequest) {
       value: token,
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      // Stripe決済後のリダイレクト（別サイトからの遷移）でもログイン状態を維持するため lax にする
+      sameSite: "lax",
       maxAge: 60 * 60,
       path: "/",
     });
