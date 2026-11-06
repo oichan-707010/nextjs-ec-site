@@ -6,6 +6,11 @@ const dbConfig = {
   user: process.env.DB_USER,
   password: process.env.DB_PASS,
   database: process.env.DB_NAME,
+  // TiDB Cloud（本番）はTLS接続が必須のため、DB_SSL=true のときだけSSLを有効化する
+  // ローカル（MAMP/XAMPP等）では DB_SSL を設定しなければ従来どおり接続される
+  ...(process.env.DB_SSL === "true" && {
+    ssl: { minVersion: "TLSv1.2", rejectUnauthorized: true },
+  }),
 };
 
 const pool = mysql.createPool(dbConfig);

@@ -22,6 +22,10 @@ export const metadata: Metadata = {
     "最新のトレンドとテクノロジーを取り入れたアイテムをお届けします。",
 };
 
+// ログイン状態（cookie）をレイアウトで読むため、全ページでリクエスト時のレンダリングを許可する
+// （cacheComponents有効時、これがないと本番ビルド `next build` が失敗する）
+export const instant = false;
+
 export default async function RootLayout({ children }: LayoutProps<"/">) {
   const user = await getAuthUser();
 

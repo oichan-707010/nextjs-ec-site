@@ -108,9 +108,9 @@ export async function POST(request: NextRequest) {
       mode: "payment",
       customer_email: user.email || undefined,
 
-      success_url: `${request.nextUrl.origin}/account?session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `${process.env.BASE_URL}/account?session_id={CHECKOUT_SESSION_ID}`,
 
-      cancel_url: `${request.nextUrl.origin}/order-confirm`,
+      cancel_url: `${process.env.BASE_URL}/order-confirm`,
 
       metadata: {
         orderId: orderId.toString(),
