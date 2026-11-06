@@ -1,3 +1,4 @@
+import { unstable_rethrow } from "next/navigation";
 import { executeQuery } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -42,6 +43,8 @@ export async function GET() {
 
     return NextResponse.json({ inquiries });
   } catch (err) {
+    // ビルド時のプリレンダリング中断などNext.js内部のエラーはNext.jsに処理を任せる
+    unstable_rethrow(err);
     console.error("お問い合わせ取得エラー：", err);
     return NextResponse.json(
       {

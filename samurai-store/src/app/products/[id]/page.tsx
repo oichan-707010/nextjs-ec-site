@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { notFound, unstable_rethrow } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { type ProductData } from "@/types/product";
@@ -28,6 +28,8 @@ async function getProduct(id: string): Promise<Product | null> {
     const product = await res.json();
     return product;
   } catch (err) {
+    // プリレンダリング中断などNext.js内部のエラーは握りつぶさず、Next.jsに処理を任せる
+    unstable_rethrow(err);
     console.error("商品取得エラー:", err);
     return null;
   }

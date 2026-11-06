@@ -1,3 +1,4 @@
+import { unstable_rethrow } from "next/navigation";
 import { getAuthUser, type AuthUser } from "@/lib/auth";
 import { executeQuery } from "@/lib/db";
 import { NextResponse } from "next/server";
@@ -90,6 +91,8 @@ export async function GET() {
     const orders = Array.from(ordersMap.values());
     return NextResponse.json({ orders });
   } catch (err) {
+    // ビルド時のプリレンダリング中断などNext.js内部のエラーはNext.jsに処理を任せる
+    unstable_rethrow(err);
     console.error("注文取得エラー：", err);
     return NextResponse.json(
       { message: "サーバーエラーが発生しました。" },

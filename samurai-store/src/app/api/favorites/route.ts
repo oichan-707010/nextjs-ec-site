@@ -1,3 +1,4 @@
+import { unstable_rethrow } from "next/navigation";
 import { getAuthUser, type AuthUser } from "@/lib/auth";
 import { executeQuery } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
@@ -22,6 +23,8 @@ export async function GET() {
 
     return NextResponse.json(favorites);
   } catch (err) {
+    // ビルド時のプリレンダリング中断などNext.js内部のエラーはNext.jsに処理を任せる
+    unstable_rethrow(err);
     console.error("お気に入り取得エラー：", err);
     return NextResponse.json(
       { message: "サーバーエラーが発生しました。" },
