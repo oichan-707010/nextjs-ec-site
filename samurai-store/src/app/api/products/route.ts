@@ -31,11 +31,11 @@ export async function GET(request: NextRequest) {
     let order = "";
     switch (sort) {
       case "priceAsc":
-        order = "ORDER BY price ASC";
+        order = "ORDER BY p.price ASC";
         break;
       case "new":
       default:
-        order = "ORDER BY created_at DESC";
+        order = "ORDER BY p.created_at DESC";
         break;
     }
 
@@ -43,7 +43,9 @@ export async function GET(request: NextRequest) {
     const keyword = searchParams.get("keyword")?.trim() || "";
 
     // WHERE句のベースを構築
-    const where = keyword ? "WHERE (name LIKE ? OR description LIKE ?)" : "";
+    const where = keyword
+      ? "WHERE (p.name LIKE ? OR p.description LIKE ?)"
+      : "";
 
     // WHERE句に指定するパラメータを構築
     const whereParams = keyword ? [`%${keyword}%`, `%${keyword}%`] : [];
@@ -55,12 +57,20 @@ export async function GET(request: NextRequest) {
     // 2つのデータベース操作を並行処理で実施
     const [products, totalItemsResult] = await Promise.all([
       executeQuery<Product[]>(
-        `SELECT * FROM products ${where} ${order} LIMIT ? OFFSET ?;`,
+        `SELECT
+        p.id, p.name, p.price, p.stock, p.image_url, p.updated_at,
+        COALESCE(ROUND(AVG(r.score), 1), 0) AS review_avg,
+        COALESCE(COUNT(r.id), 0) AS review_count
+        FROM products AS p
+        LEFT JOIN reviews AS r ON p.id = r.product_id
+        ${where} 
+        GROUP BY p.id, p.name, p.price, p.stock, p.image_url, p.updated_at
+        ${order} LIMIT ? OFFSET ?;`,
         productsParams,
       ),
       // フィルタリング条件に合致する商品データの全件数を取得
       executeQuery<{ count: number }>(
-        `SELECT COUNT(*) AS count FROM products ${where};`,
+        `SELECT COUNT(*) AS count FROM products AS p ${where};`,
         countParams,
       ),
     ]);

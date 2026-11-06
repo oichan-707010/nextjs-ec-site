@@ -8,11 +8,11 @@ interface UserFormProps {
     email: string;
   };
   submitLabel: string;
-  withPassword: boolean;
+  withPassword?: boolean;
 }
 
 const inputStyle =
-  "w-full border border-gray-300 px-3 py-2 rounded-sm focus:ring-2 focus:ring-indigo-500";
+  "w-full border border-gray-300 px-3 py-2 rounded-sm focus:ring-2 focus:ring-indigo-500 dark:text-gray-800";
 const labelStyle = "block font-bold mb-1";
 const badgeStyle =
   "ml-2 px-2 py-0.5 bg-red-500 text-white text-xs font-semibold rounded-md";
