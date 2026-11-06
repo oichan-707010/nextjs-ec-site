@@ -17,7 +17,8 @@ export async function GET(
 
     let page = Number(searchParams.get("page")) || 1;
     const perPage = 10;
-    page = Math.max(1, Math.min(page, 1000));
+    // LIMIT/OFFSETはSQLに直接埋め込むため、必ず整数にしておく
+    page = Math.trunc(Math.max(1, Math.min(page, 1000)));
 
     const offset = (page - 1) * perPage;
 
@@ -30,10 +31,11 @@ export async function GET(
         JOIN users AS u ON r.user_id = u.id 
         WHERE r.product_id = ?
         ORDER BY r.created_at DESC
-        LIMIT ? 
-        OFFSET ? 
+        LIMIT ${perPage}
+        OFFSET ${offset}
         ;`,
-        [productId, perPage, offset],
+        // TiDBはLIMIT/OFFSETをプレースホルダ(?)で受け取れないため、整数をSQLに直接埋め込む
+        [productId],
       ),
 
       executeQuery<{ count: number; review_avg: number }>(

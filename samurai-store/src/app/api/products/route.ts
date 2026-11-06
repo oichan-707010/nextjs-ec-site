@@ -18,8 +18,9 @@ export async function GET(request: NextRequest) {
     let perPage = Number(searchParams.get("perPage")) || 16;
 
     // 最大値・最小値を超えている場合は補正
-    page = Math.max(1, Math.min(page, 1000));
-    perPage = Math.max(1, Math.min(perPage, 100));
+    // LIMIT/OFFSETはSQLに直接埋め込むため、必ず整数にしておく
+    page = Math.trunc(Math.max(1, Math.min(page, 1000)));
+    perPage = Math.trunc(Math.max(1, Math.min(perPage, 100)));
 
     // オフセット(スキップする件数)を計算
     const offset = (page - 1) * perPage;
@@ -51,7 +52,8 @@ export async function GET(request: NextRequest) {
     const whereParams = keyword ? [`%${keyword}%`, `%${keyword}%`] : [];
 
     // SQL文に埋め込むパラメータを構築
-    const productsParams = [...whereParams, perPage, offset];
+    // TiDBはLIMIT/OFFSETをプレースホルダ(?)で受け取れないため、整数をSQLに直接埋め込む
+    const productsParams = [...whereParams];
     const countParams = [...whereParams];
 
     // 2つのデータベース操作を並行処理で実施
@@ -65,7 +67,7 @@ export async function GET(request: NextRequest) {
         LEFT JOIN reviews AS r ON p.id = r.product_id
         ${where} 
         GROUP BY p.id, p.name, p.price, p.stock, p.image_url, p.updated_at
-        ${order} LIMIT ? OFFSET ?;`,
+        ${order} LIMIT ${perPage} OFFSET ${offset};`,
         productsParams,
       ),
       // フィルタリング条件に合致する商品データの全件数を取得
